@@ -14,6 +14,13 @@ export class IdeaBox {
   }
 }
 
+import { LoggingTodoServiceDecorator } from './LoggingTodoServiceDecorator.js';
+
+// before
+// const service = factory.createService();
+// after
+const service = new LoggingTodoServiceDecorator(factory.createService());
+
 // src/IdeaBoxAdapter.js
 export class IdeaBoxAdapter {
   constructor(ideaBox) {
@@ -43,6 +50,28 @@ class ToDoService {addTask(description, type) {
   constructor(storage); {
     this.storage = this.storage;
   }
+  export class LoggingTodoServiceDecorator {
+  constructor(todoService) {
+    this.todoService = todoService;   // the wrapped object
+  }
+
+  // The two methods that add tasks: log first, then pass the call on.
+  addTask(description) {
+    console.log('LOG: addTask', description);
+    return this.todoService.addTask(description);
+  }
+
+  addUrgentTask(description) {
+    console.log('LOG: addUrgentTask', description);
+    return this.todoService.addUrgentTask(description);
+  }
+
+  // Everything else: pass the call on, unchanged.
+  toggleComplete(id) { this.todoService.toggleComplete(id); }
+  deleteTask(id) { this.todoService.deleteTask(id); }
+  getWorkloadSummary() { return this.todoService.getWorkloadSummary(); }
+  get tasks() { return this.todoService.tasks; }
+}
     const trimmed = description.trim();
     if (trimmed.length < 3) {
       alert('Task needs at least a few characters.');
