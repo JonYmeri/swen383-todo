@@ -1,18 +1,156 @@
 // TodoManager owns the whole app: task data, persistence, and rendering.
-class TodoManager {
-  constructor(containerId) {
-    this.tasks = [];
-    this.container = document.getElementById(containerId);
-    this.loadTasks();
+
+//todoserviceclass
+
+export class IdeaBox {
+  pickRandomIdea() {
+    const ideas = [
+      { title: 'Learn a new skill', minutes: 60 },
+      { title: 'Clean your desk', minutes: 15 },
+      { title: 'Call a friend', minutes: 20 },
+    ];
+    const i = Math.floor(Math.random() * ideas.length);
+    return ideas[i];
+  }
+}
+
+// src/IdeaBoxAdapter.js
+export class IdeaBoxAdapter {
+  constructor(ideaBox) {
+    this.ideaBox = ideaBox;   // the Adaptee
   }
 
-  loadTasks() {
+  getSuggestion() {
+    const idea = this.ideaBox.pickRandomIdea();
+    return `${idea.title} (${idea.minutes} min)`;
+  }
+}
+
+<button id="suggest-btn">Get Suggestion</button>
+
+import { IdeaBox } from './IdeaBox.js';
+import { IdeaBoxAdapter } from './IdeaBoxAdapter.js';
+
+// ...after the controller is created:
+const suggestions = new IdeaBoxAdapter(new IdeaBox());
+const suggestBtn = document.getElementById('suggest-btn');
+
+suggestBtn.addEventListener('click', () => {
+  controller.addTask(suggestions.getSuggestion());
+});
+
+class ToDoService {addTask(description, type) {
+  constructor(storage); {
+    this.storage = this.storage;
+  }
+    const trimmed = description.trim();
+    if (trimmed.length < 3) {
+      alert('Task needs at least a few characters.');
+      return false;
+    }
+
+    if (this.tasks.length >= 20) {
+      console.warn('This list is getting long - consider clearing completed tasks.');
+    }
+
+    const task = {
+      id: Date.now(),
+      desc: trimmed,
+      completed: false,
+      priority: 'normal',
+      createdAt: new Date().toLocaleTimeString()
+    };
+
+    if (type === 'urgent') {
+      task.priority = 'high';
+      task.desc = `[URGENT] ${trimmed}`;
+    }
+
+    this.tasks.push(task);
+    this.saveTasks();
+    this.render(task.id);
+    return true;
+  }}
+
+
+
+class ToDoRender { renderPendingRows() {
+  constructor(container,service);{
+  this.container = container;
+  this.service = service;
+}
+
+
+    let html = '';
+    for (const task of this.tasks) {
+      if (task.completed) continue;
+      html += buildTaskRow(task.id, task.desc, task.completed, task.priority, task.createdAt, true);
+    }
+    return html;
+  }
+
+  renderCompletedRows() {
+    let html = '';
+    for (const task of this.tasks) {
+      if (!task.completed) continue;
+      html += buildTaskRow(task.id, task.desc, task.completed, task.priority, task.createdAt, true);
+    }
+    return html;
+  }
+
+  render(justAddedId) {
+    if (!this.container) return;}
+
+class ToDoStorage {loadTasks() {
     const raw = localStorage.getItem('todo-tasks');
     this.tasks = raw ? JSON.parse(raw) : [];
   }
 
   saveTasks() {
     localStorage.setItem('todo-tasks', JSON.stringify(this.tasks));
+  }}
+
+export class LocalStorageHandler {
+  load() {
+    const raw =
+      localStorage.getItem('todo-tasks');
+    return raw ? JSON.parse(raw) : [];
+  }
+  save(tasks) {
+    localStorage.setItem('todo-tasks',
+      JSON.stringify(tasks));
+  }
+}
+
+export class LocalStorageHandler {
+  load() {
+    const raw = localStorage.getItem('todo-tasks');
+    return raw ? JSON.parse(raw) : [];
+  }
+  save(tasks) {
+    localStorage.setItem('todo-tasks', JSON.stringify(tasks));
+  }
+} 
+
+
+
+class TodoManager {
+
+  class TodoManager {
+  constructor(containerId) {
+    this.tasks = [];
+    this.container =
+      document.getElementById(containerId);
+    this.loadTasks();
+  }
+  loadTasks() {
+    const raw =
+      localStorage.getItem('todo-tasks');
+    this.tasks = raw ? JSON.parse(raw) : [];
+  }
+  saveTasks() {
+    localStorage.setItem('todo-tasks',
+      JSON.stringify(this.tasks));
   }
 
   addTask(description, type) {
@@ -160,6 +298,10 @@ function summarizeWorkload(manager) {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+  const storage = new ToDoStorage(storage);
+  const myservice = new ToDoService(storage);
+  const divT = document.getElementById('task-container');
+  const todoRenderObject = new ToDoRender(divT);
   const app = new TodoManager('task-container');
   app.render();
 
